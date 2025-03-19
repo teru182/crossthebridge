@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Cross the Bridge - タッチ対応版</title>
+  <title>Cross the Bridge</title>
   <style>
     body {
       margin: 0;
@@ -17,7 +17,7 @@
   </style>
 </head>
 <body>
-  <canvas id="gameCanvas" width="500" height="600"></canvas>
+  <canvas id="gameCanvas" width="800" height="600"></canvas>
   <script>
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
@@ -246,11 +246,11 @@
       ctx.fillRect(0, groundY - platformHeight, canvasWidth, platformHeight);
 
       // 現在の足場
-      ctx.fillStyle = "#000";
+      ctx.fillStyle = "#008800";
       ctx.fillRect(currentPlatform.x, groundY - platformHeight, currentPlatform.width, platformHeight);
 
       // 次の足場
-      ctx.fillStyle = "#000";
+      ctx.fillStyle = "#008800";
       ctx.fillRect(nextPlatform.x, groundY - platformHeight, nextPlatform.width, platformHeight);
 
       // 橋の描画（足場の右端をピボット）
