@@ -31,7 +31,7 @@
 
     // ゲーム状態
     let gameState = "waiting"; 
-    // waiting, growing, falling, walking, fallingCharacter, transition, gameover
+    // waiting, growing, falling, walking, fallingCharacter, transition, game
     let lastTime = 0;
     // 橋の情報：angleは倒れる角度。初期は0（垂直に伸びてる状態）、倒れるとMath.PI/2まで増えて右（水平）になる
     let bridge = { length: 0, angle: 0 };
@@ -273,17 +273,17 @@
       // スコア表示
       ctx.fillStyle = "#d0d0d0";
       ctx.font = "40px sans-serif";
-      ctx.fillText("Score: " + score, 10, 30);
+      ctx.fillText("Score: " + score, canvasWidth / 2, 30);
 
       // ゲームオーバー表示
       if(gameState === "gameover") {
         ctx.fillStyle = "rgba(0,0,0,0.5)";
         ctx.fillRect(0, 0, canvasWidth, canvasHeight);
         ctx.fillStyle = "#fff";
-        ctx.font = "30px sans-serif";
+        ctx.font = "40px sans-serif";
         ctx.textAlign = "center";
         ctx.fillText("Game Over", canvasWidth / 2, canvasHeight / 2);
-        ctx.font = "40px sans-serif";
+        ctx.font = "30px sans-serif";
         ctx.fillText("Click or Tap to Restart", canvasWidth / 2, canvasHeight / 2 + 40);
       }
     }
