@@ -31,24 +31,24 @@
     const canvasHeight = canvas.height;
     const platformHeight = 300;
     const groundY = canvasHeight;
-    const growthRate = 300; // ‹´‚ªL‚Ñ‚éƒXƒs[ƒh(px/sec)
-    const walkSpeed = 200;   // ƒLƒƒƒ‰‚Ì•à‚­ƒXƒs[ƒh(px/sec)
+    const growthRate = 300; // æ©‹ãŒä¼¸ã³ã‚‹ã‚¹ãƒ”ãƒ¼ãƒ‰(px/sec)
+    const walkSpeed = 200;   // ã‚­ãƒ£ãƒ©ã®æ­©ãã‚¹ãƒ”ãƒ¼ãƒ‰(px/sec)
 
-    // ƒQ[ƒ€ó‘Ô
+    // ã‚²ãƒ¼ãƒ çŠ¶æ…‹
     let gameState = "waiting"; 
     // waiting, growing, falling, walking, fallingCharacter, transition, game
     let lastTime = 0;
-    // ‹´‚Ìî•ñFangle‚Í“|‚ê‚éŠp“xB‰Šú‚Í0i‚’¼‚ÉL‚Ñ‚Ä‚éó‘ÔjA“|‚ê‚é‚ÆMath.PI/2‚Ü‚Å‘‚¦‚Ä‰Ei…•½j‚É‚È‚é
+    // æ©‹ã®æƒ…å ±ï¼šangleã¯å€’ã‚Œã‚‹è§’åº¦ã€‚åˆæœŸã¯0ï¼ˆå‚ç›´ã«ä¼¸ã³ã¦ã‚‹çŠ¶æ…‹ï¼‰ã€å€’ã‚Œã‚‹ã¨Math.PI/2ã¾ã§å¢—ãˆã¦å³ï¼ˆæ°´å¹³ï¼‰ã«ãªã‚‹
     let bridge = { length: 0, angle: 0 };
-    // ƒLƒƒƒ‰Fx,y‚Í‘«Œ³i’ê‚Ì’†SjAsize‚ÍƒLƒƒƒ‰‚ÌƒTƒCƒYihead‚Ì’¼Œa‚Æ‚µ‚Ä—˜—pj
+    // ã‚­ãƒ£ãƒ©ï¼šx,yã¯è¶³å…ƒï¼ˆåº•ã®ä¸­å¿ƒï¼‰ã€sizeã¯ã‚­ãƒ£ãƒ©ã®ã‚µã‚¤ã‚ºï¼ˆheadã®ç›´å¾„ã¨ã—ã¦åˆ©ç”¨ï¼‰
     let character = { x: 0, y: 0, size: 20 };
 
-    // ‘«ê‚Ìî•ñ
+    // è¶³å ´ã®æƒ…å ±
     let currentPlatform = { x: 50, width: 100 };
     let nextPlatform = { x: 0, width: 0 };
-    let gap = 0; // currentPlatform‚Ì‰E’[‚©‚çŸ‚Ì‘«ê‚Ü‚Å‚Ì‹——£
+    let gap = 0; // currentPlatformã®å³ç«¯ã‹ã‚‰æ¬¡ã®è¶³å ´ã¾ã§ã®è·é›¢
 
-    // ƒXƒRƒA‚Æ•àsƒAƒjƒ[ƒVƒ‡ƒ“—p
+    // ã‚¹ã‚³ã‚¢ã¨æ­©è¡Œã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ç”¨
     let  = 0;
     let walkCycle = 0;
 
@@ -57,7 +57,7 @@
       currentPlatform = { x: 50, width: 100 };
       generateNextPlatform();
       bridge = { length: 0, angle: 0 };
-      // ƒLƒƒƒ‰‚Ì‘«Œ³‚ğ‘«ê‚Ìã‚É‡‚í‚¹‚é
+      // ã‚­ãƒ£ãƒ©ã®è¶³å…ƒã‚’è¶³å ´ã®ä¸Šã«åˆã‚ã›ã‚‹
       character = { 
         x: currentPlatform.x + currentPlatform.width - 20, 
         y: groundY - platformHeight, 
@@ -67,14 +67,14 @@
       walkCycle = 0;
     }
 
-    // Ÿ‚Ì‘«ê¶¬igap:50`200px, •:50`100pxj
+    // æ¬¡ã®è¶³å ´ç”Ÿæˆï¼ˆgap:50ï½200px, å¹…:50ï½100pxï¼‰
     function generateNextPlatform() {
       gap = Math.floor(Math.random() * 100) + 25;
       const width = Math.floor(Math.random() * 50) + 25;
       nextPlatform = { x: currentPlatform.x + currentPlatform.width + gap, width: width };
     }
 
-    // ƒ}ƒEƒXƒCƒxƒ“ƒg
+    // ãƒã‚¦ã‚¹ã‚¤ãƒ™ãƒ³ãƒˆ
     canvas.addEventListener("mousedown", function(e) {
       if(gameState === "waiting") {
         gameState = "growing";
@@ -89,7 +89,7 @@
       }
     });
 
-    // ƒ^ƒbƒ`ƒCƒxƒ“ƒg
+    // ã‚¿ãƒƒãƒã‚¤ãƒ™ãƒ³ãƒˆ
     canvas.addEventListener("touchstart", function(e) {
       e.preventDefault();
       if(gameState === "waiting") {
@@ -106,7 +106,7 @@
       }
     });
 
-    // –œ‚ªˆêƒ^ƒbƒ`‚ª’†’f‚³‚ê‚½ê‡
+    // ä¸‡ãŒä¸€ã‚¿ãƒƒãƒãŒä¸­æ–­ã•ã‚ŒãŸå ´åˆ
     canvas.addEventListener("touchcancel", function(e) {
       e.preventDefault();
       if(gameState === "growing") {
@@ -116,10 +116,10 @@
 
     function update(dt) {
       if(gameState === "growing") {
-        // ƒ^ƒbƒv’†‚Í‹´‚ğã‚Éi‚’¼‚ÉjL‚Î‚·
+        // ã‚¿ãƒƒãƒ—ä¸­ã¯æ©‹ã‚’ä¸Šã«ï¼ˆå‚ç›´ã«ï¼‰ä¼¸ã°ã™
         bridge.length += growthRate * dt;
       } else if(gameState === "falling") {
-        // ƒ^ƒbƒv‚ğ—£‚·‚Æ‹´‚ª‰E‚É“|‚ê‚é
+        // ã‚¿ãƒƒãƒ—ã‚’é›¢ã™ã¨æ©‹ãŒå³ã«å€’ã‚Œã‚‹
         const targetAngle = Math.PI / 2;
         const fallDuration = 0.3;
         const angleIncrement = (targetAngle / fallDuration) * dt;
@@ -129,30 +129,30 @@
           gameState = "walking";
         }
       } else if(gameState === "walking") {
-        // •àsƒAƒjƒ[ƒVƒ‡ƒ“—p‚Ìƒ^ƒCƒ}[XV
+        // æ­©è¡Œã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ç”¨ã®ã‚¿ã‚¤ãƒãƒ¼æ›´æ–°
         walkCycle += dt;
-        // ƒLƒƒƒ‰‚ª‹´‚ğ“n‚é
+        // ã‚­ãƒ£ãƒ©ãŒæ©‹ã‚’æ¸¡ã‚‹
         const targetX = currentPlatform.x + currentPlatform.width + bridge.length;
         character.x += walkSpeed * dt;
         if(character.x >= targetX) {
-          // ‹´‚Ì’·‚³‚ª‘«ê‚É‡‚Á‚Ä‚ê‚Î¬Œ÷
+          // æ©‹ã®é•·ã•ãŒè¶³å ´ã«åˆã£ã¦ã‚Œã°æˆåŠŸ
           if(bridge.length >= gap && bridge.length <= gap + nextPlatform.width) {
             character.x = targetX;
             score++;
             gameState = "transition";
           } else {
-            // ¸”s‚Ìê‡‚ÍAƒLƒƒƒ‰‚ª‹´‚Ìæ’[‚Å—‚¿‚é
+            // å¤±æ•—ã®å ´åˆã¯ã€ã‚­ãƒ£ãƒ©ãŒæ©‹ã®å…ˆç«¯ã§è½ã¡ã‚‹
             gameState = "fallingCharacter";
           }
         }
       } else if(gameState === "fallingCharacter") {
-        // —‰º‘¬“x: 500px/sec
+        // è½ä¸‹é€Ÿåº¦: 500px/sec
         character.y += 500 * dt;
         if(character.y > canvasHeight) {
           gameState = "gameover";
         }
       } else if(gameState === "transition") {
-        // ƒXƒe[ƒWƒNƒŠƒAŒãAƒV[ƒ“‚ğ¶‚ÉƒXƒ‰ƒCƒh‚³‚¹‚é
+        // ã‚¹ãƒ†ãƒ¼ã‚¸ã‚¯ãƒªã‚¢å¾Œã€ã‚·ãƒ¼ãƒ³ã‚’å·¦ã«ã‚¹ãƒ©ã‚¤ãƒ‰ã•ã›ã‚‹
         const slideSpeed = 300;
         currentPlatform.x -= slideSpeed * dt;
         nextPlatform.x -= slideSpeed * dt;
@@ -171,7 +171,7 @@
       }
     }
 
-    // ƒLƒƒƒ‰‚ğƒXƒeƒBƒbƒNƒtƒBƒMƒ…ƒA‚Å•`‰æi•às‚Æ—‰º‚ÌƒAƒjƒ[ƒVƒ‡ƒ“‘Î‰j
+    // ã‚­ãƒ£ãƒ©ã‚’ã‚¹ãƒ†ã‚£ãƒƒã‚¯ãƒ•ã‚£ã‚®ãƒ¥ã‚¢ã§æç”»ï¼ˆæ­©è¡Œã¨è½ä¸‹ã®ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³å¯¾å¿œï¼‰
     function drawStickFigure(x, y, state, walkCycle) {
       const size = character.size;
       const headRadius = size / 2;
@@ -186,12 +186,12 @@
       ctx.lineWidth = 2;
       ctx.strokeStyle = "#f00";
       
-      // “ª
+      // é ­
       ctx.beginPath();
       ctx.arc(x, headCenterY, headRadius, 0, Math.PI * 2);
       ctx.stroke();
       
-      // ‘Ì
+      // ä½“
       ctx.beginPath();
       ctx.moveTo(x, bodyTop);
       ctx.lineTo(x, hipY);
@@ -203,7 +203,7 @@
           leftArmAngle = Math.PI/2 + Math.sin(walkCycle * 10) * (Math.PI / 16);
           rightArmAngle = Math.PI/2 - Math.sin(walkCycle * 10) * (Math.PI / 16);
       } else if(state === "falling") {
-          // —‚¿‚é‚Íè‚ğã‚°‚½ƒ|[ƒY
+          // è½ã¡ã‚‹æ™‚ã¯æ‰‹ã‚’ä¸Šã’ãŸãƒãƒ¼ã‚º
           legSwing = 0;
           leftArmAngle = -Math.PI/4;
           rightArmAngle = -3 * Math.PI/4;
@@ -213,7 +213,7 @@
           rightArmAngle = Math.PI/2;
       }
       
-      // ˜r
+      // è…•
       ctx.beginPath();
       ctx.moveTo(x, bodyTop);
       ctx.lineTo(x + armLength * Math.cos(leftArmAngle), bodyTop + armLength * Math.sin(leftArmAngle));
@@ -224,7 +224,7 @@
       ctx.lineTo(x + armLength * Math.cos(rightArmAngle), bodyTop + armLength * Math.sin(rightArmAngle));
       ctx.stroke();
       
-      // ‹ri¶‹rj
+      // è„šï¼ˆå·¦è„šï¼‰
       const leftHipX = x - hipOffset;
       const leftLegEndX = leftHipX + legLength * Math.sin(legSwing);
       const leftLegEndY = hipY + legLength * Math.cos(legSwing);
@@ -233,7 +233,7 @@
       ctx.lineTo(leftLegEndX, leftLegEndY);
       ctx.stroke();
       
-      // ‹ri‰E‹rj
+      // è„šï¼ˆå³è„šï¼‰
       const rightHipX = x + hipOffset;
       const rightLegEndX = rightHipX + legLength * Math.sin(-legSwing);
       const rightLegEndY = hipY + legLength * Math.cos(-legSwing);
@@ -246,19 +246,19 @@
     function draw() {
       ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 
-      // ’n–Êi‘«ê”wŒij
+      // åœ°é¢ï¼ˆè¶³å ´èƒŒæ™¯ï¼‰
       ctx.fillStyle = "#00c7dd";
       ctx.fillRect(0, groundY - platformHeight, canvasWidth, platformHeight);
 
-      // Œ»İ‚Ì‘«ê
+      // ç¾åœ¨ã®è¶³å ´
       ctx.fillStyle = "#008800";
       ctx.fillRect(currentPlatform.x, groundY - platformHeight, currentPlatform.width, platformHeight);
 
-      // Ÿ‚Ì‘«ê
+      // æ¬¡ã®è¶³å ´
       ctx.fillStyle = "#008800";
       ctx.fillRect(nextPlatform.x, groundY - platformHeight, nextPlatform.width, platformHeight);
 
-      // ‹´‚Ì•`‰æi‘«ê‚Ì‰E’[‚ğƒsƒ{ƒbƒgj
+      // æ©‹ã®æç”»ï¼ˆè¶³å ´ã®å³ç«¯ã‚’ãƒ”ãƒœãƒƒãƒˆï¼‰
       ctx.save();
       ctx.translate(currentPlatform.x + currentPlatform.width, groundY - platformHeight);
       ctx.rotate(-Math.PI/2 + bridge.angle);
@@ -266,7 +266,7 @@
       ctx.fillRect(0, -5, bridge.length, 10);
       ctx.restore();
 
-      // ƒLƒƒƒ‰‚Ì•`‰æ
+      // ã‚­ãƒ£ãƒ©ã®æç”»
       let drawState = "standing";
       if(gameState === "walking") {
         drawState = "walking";
@@ -275,12 +275,12 @@
       }
       drawStickFigure(character.x, character.y, drawState, walkCycle);
 
-      // ƒXƒRƒA•\¦
+      // ã‚¹ã‚³ã‚¢è¡¨ç¤º
       ctx.fillStyle = "#f06080";
       ctx.font = "30px sans-serif";
       ctx.fillText("Score: " + score, canvasWidth / 2, 40);
 
-      // ƒQ[ƒ€ƒI[ƒo[•\¦
+      // ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼è¡¨ç¤º
       if(gameState === "gameover") {
         ctx.fillStyle = "rgba(0,0,0,0.5)";
         ctx.fillRect(0, 0, canvasWidth, canvasHeight);
