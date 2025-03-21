@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+
+  <title>Cross the Bridge</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: #80a0f0;
+    }
+    canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+      touch-action: none; /* タッチのデフォルト操作を無効化 */
+    }
+  </style>
+</head>
+<body>
+  <canvas id="gameCanvas"></canvas>
+  <script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+
+    const canvasWidth = canvas.width;
+    const canvasHeight = canvas.height;
+    const platformHeight = 20;
+    const groundY = canvasHeight;
+    const growthRate = 300; // 橋が伸びるスピード(px/sec)
+    const walkSpeed = 200;   // キャラの歩くスピード(px/sec)
+
+    // ゲーム状態
+    let gameState = "waiting"; 
+    // waiting, growing, falling, walking, fallingCharacter, transition, game
+    let lastTime = 0;
+    // 橋の情報：angleは倒れる角度。初期は0（垂直に伸びてる状態）、倒れるとMath.PI/2まで増えて右（水平）になる
+    let bridge = { length: 0, angle: 0 };
+    // キャラ：x,yは足元（底の中心）、sizeはキャラのサイズ（headの直径として利用）
+    let character = { x: 0, y: 0, size: 20 };
+
+    // 足場の情報
+    let currentPlatform = { x: 50, width: 100 };
+    let nextPlatform = { x: 0, width: 0 };
+    let gap = 0; // currentPlatformの右端から次の足場までの距離
+
+    // スコアと歩行アニメーション用
+    let score = 0;
+    let walkCycle = 0;
+
+    function initGame() {
+      gameState = "waiting";
+      currentPlatform = { x: 50, width: 100 };
+      generateNextPlatform();
+      bridge = { length: 0, angle: 0 };
+      // キャラの足元を足場の上に合わせる
+      character = { 
+        x: currentPlatform.x + currentPlatform.width - 20, 
+        y: groundY - platformHeight, 
+        size: 20 
+      };
+      score = 0;
+      walkCycle = 0;
+    }
+
+    // 次の足場生成（gap:50～200px, 幅:50～100px）
+    function generateNextPlatform() {
+      gap = Math.floor(Math.random() * 100) + 25;
+      const width = Math.floor(Math.random() * 25) + 25;
+      nextPlatform = { x: currentPlatform.x + currentPlatform.width + gap, width: width };
+    }
+
+    // マウスイベント
+    canvas.addEventListener("mousedown", function(e) {
+      if(gameState === "waiting") {
+        gameState = "growing";
+      } else if(gameState === "gameover") {
+        initGame();
+      }
+    });
+
+    canvas.addEventListener("mouseup", function(e) {
+      if(gameState === "growing") {
+        gameState = "falling";
+      }
+    });
+
+    // タッチイベント
+    canvas.addEventListener("touchstart", function(e) {
+      e.preventDefault();
+      if(gameState === "waiting") {
+        gameState = "growing";
+      } else if(gameState === "gameover") {
+        initGame();
+      }
+    });
+
+    canvas.addEventListener("touchend", function(e) {
+      e.preventDefault();
+      if(gameState === "growing") {
+        gameState = "falling";
+      }
+    });
+
+    // 万が一タッチが中断された場合
+    canvas.addEventListener("touchcancel", function(e) {
+      e.preventDefault();
+      if(gameState === "growing") {
+        gameState = "falling";
+      }
+    });
+
+    function update(dt) {
+      if(gameState === "growing") {
+        // タップ中は橋を上に（垂直に）伸ばす
+        bridge.length += growthRate * dt;
+      } else if(gameState === "falling") {
+        // タップを離すと橋が右に倒れる
+        const targetAngle = Math.PI / 2;
+        const fallDuration = 0.3;
+        const angleIncrement = (targetAngle / fallDuration) * dt;
+        bridge.angle += angleIncrement;
+        if(bridge.angle >= targetAngle) {
+          bridge.angle = targetAngle;
+          gameState = "walking";
+        }
+      } else if(gameState === "walking") {
+        // 歩行アニメーション用のタイマー更新
+        walkCycle += dt;
+        // キャラが橋を渡る
+        const targetX = currentPlatform.x + currentPlatform.width + bridge.length;
+        character.x += walkSpeed * dt;
+        if(character.x >= targetX) {
+          // 橋の長さが足場に合ってれば成功
+          if(bridge.length >= gap && bridge.length <= gap + nextPlatform.width) {
+            character.x = targetX;
+            score++;
+            gameState = "transition";
+          } else {
+            // 失敗の場合は、キャラが橋の先端で落ちる
+            gameState = "fallingCharacter";
+          }
+        }
+      } else if(gameState === "fallingCharacter") {
+        // 落下速度: 500px/sec
+        character.y += 500 * dt;
+        if(character.y > canvasHeight) {
+          gameState = "gameover";
+        }
+      } else if(gameState === "transition") {
+        // ステージクリア後、シーンを左にスライドさせる
+        const slideSpeed = 300;
+        currentPlatform.x -= slideSpeed * dt;
+        nextPlatform.x -= slideSpeed * dt;
+        character.x -= slideSpeed * dt;
+        if(currentPlatform.x + currentPlatform.width < 0) {
+          currentPlatform = nextPlatform;
+          generateNextPlatform();
+          bridge = { length: 0, angle: 0 };
+          character = { 
+            x: currentPlatform.x + currentPlatform.width - 20, 
+            y: groundY - platformHeight, 
+            size: 20 
+          };
+          gameState = "waiting";
+        }
+      }
+    }
+
+    // キャラをスティックフィギュアで描画（歩行と落下のアニメーション対応）
+    function drawStickFigure(x, y, state, walkCycle) {
+      const size = character.size;
+      const headRadius = size / 2;
+      const bodyLength = size;
+      const legLength = size;
+      const armLength = size;
+      const hipOffset = 5;
+      const hipY = y - legLength;
+      const bodyTop = hipY - bodyLength;
+      const headCenterY = bodyTop - headRadius;
+      
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = "#f00";
+      
+      // 頭
+      ctx.beginPath();
+      ctx.arc(x, headCenterY, headRadius, 0, Math.PI * 2);
+      ctx.stroke();
+      
+      // 体
+      ctx.beginPath();
+      ctx.moveTo(x, bodyTop);
+      ctx.lineTo(x, hipY);
+      ctx.stroke();
+      
+      let leftArmAngle, rightArmAngle, legSwing;
+      if(state === "walking") {
+          legSwing = Math.sin(walkCycle * 10) * (Math.PI / 8);
+          leftArmAngle = Math.PI/2 + Math.sin(walkCycle * 10) * (Math.PI / 16);
+          rightArmAngle = Math.PI/2 - Math.sin(walkCycle * 10) * (Math.PI / 16);
+      } else if(state === "falling") {
+          // 落ちる時は手を上げたポーズ
+          legSwing = 0;
+          leftArmAngle = -Math.PI/4;
+          rightArmAngle = -3 * Math.PI/4;
+      } else {
+          legSwing = 0;
+          leftArmAngle = Math.PI/2;
+          rightArmAngle = Math.PI/2;
+      }
+      
+      // 腕
+      ctx.beginPath();
+      ctx.moveTo(x, bodyTop);
+      ctx.lineTo(x + armLength * Math.cos(leftArmAngle), bodyTop + armLength * Math.sin(leftArmAngle));
+      ctx.stroke();
+      
+      ctx.beginPath();
+      ctx.moveTo(x, bodyTop);
+      ctx.lineTo(x + armLength * Math.cos(rightArmAngle), bodyTop + armLength * Math.sin(rightArmAngle));
+      ctx.stroke();
+      
+      // 脚（左脚）
+      const leftHipX = x - hipOffset;
+      const leftLegEndX = leftHipX + legLength * Math.sin(legSwing);
+      const leftLegEndY = hipY + legLength * Math.cos(legSwing);
+      ctx.beginPath();
+      ctx.moveTo(leftHipX, hipY);
+      ctx.lineTo(leftLegEndX, leftLegEndY);
+      ctx.stroke();
+      
+      // 脚（右脚）
+      const rightHipX = x + hipOffset;
+      const rightLegEndX = rightHipX + legLength * Math.sin(-legSwing);
+      const rightLegEndY = hipY + legLength * Math.cos(-legSwing);
+      ctx.beginPath();
+      ctx.moveTo(rightHipX, hipY);
+      ctx.lineTo(rightLegEndX, rightLegEndY);
+      ctx.stroke();
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+
+      // 地面（足場背景）
+      ctx.fillStyle = "#00c7dd";
+      ctx.fillRect(0, groundY - platformHeight, canvasWidth, platformHeight);
+
+      // 現在の足場
+      ctx.fillStyle = "#008800";
+      ctx.fillRect(currentPlatform.x, groundY - platformHeight, currentPlatform.width, platformHeight);
+
+      // 次の足場
+      ctx.fillStyle = "#008800";
+      ctx.fillRect(nextPlatform.x, groundY - platformHeight, nextPlatform.width, platformHeight);
+
+      // 橋の描画（足場の右端をピボット）
+      ctx.save();
+      ctx.translate(currentPlatform.x + currentPlatform.width, groundY - platformHeight);
+      ctx.rotate(-Math.PI/2 + bridge.angle);
+      ctx.fillStyle = "#e26200";
+      ctx.fillRect(0, -5, bridge.length, 10);
+      ctx.restore();
+
+      // キャラの描画
+      let drawState = "standing";
+      if(gameState === "walking") {
+        drawState = "walking";
+      } else if(gameState === "fallingCharacter") {
+        drawState = "falling";
+      }
+      drawStickFigure(character.x, character.y, drawState, walkCycle);
+
+      // スコア表示
+      ctx.fillStyle = "#d0d0d0";
+      ctx.font = "20px sans-serif";
+      ctx.fillText("Score: " + score, canvasWidth / 2, 20);
+
+      // ゲームオーバー表示
+      if(gameState === "gameover") {
+        ctx.fillStyle = "rgba(0,0,0,0.5)";
+        ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+        ctx.fillStyle = "#fff";
+        ctx.font = "20px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText("Game Over", canvasWidth / 2, canvasHeight / 2);
+        ctx.font = "15px sans-serif";
+        ctx.fillText("Click or Tap to Restart", canvasWidth / 2, canvasHeight / 2 + 30);
+
+
+      }
+    }
+
+    function gameLoop(timestamp) {
+      if (!lastTime) lastTime = timestamp;
+      const dt = (timestamp - lastTime) / 1000;
+      lastTime = timestamp;
+      update(dt);
+      draw();
+      requestAnimationFrame(gameLoop);
+    }
+
+    initGame();
+    requestAnimationFrame(gameLoop);
+  </script>
+</body>
+</html>
